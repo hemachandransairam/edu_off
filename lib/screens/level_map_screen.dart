@@ -395,6 +395,10 @@ class _LevelMapScreenState extends State<LevelMapScreen>
                 arguments: level['data'],
               )
               as bool?;
+    } else if (type == 'drawing') {
+      // For drawing mode, we assume it's completed once the user finishes drawing
+      await Navigator.pushNamed(context, '/drawing');
+      completed = true;
     }
 
     // Only unlock next level if the game was actually completed

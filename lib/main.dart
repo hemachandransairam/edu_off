@@ -3,10 +3,12 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'screens/selection_screens.dart';
-import 'screens/game_screens.dart';
+import 'screens/game_screens.dart' hide DrawingScreen;
 import 'screens/home_screen.dart';
 import 'screens/auth_screen.dart';
 import 'screens/level_map_screen.dart';
+import 'screens/drawing_screen.dart';
+import 'screens/book_viewer_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -145,6 +147,15 @@ class KidsLearningApp extends StatelessWidget {
             return MaterialPageRoute(
               builder: (_) => DragDropGameScreen(data: data),
             );
+          case '/book_viewer':
+            final args = settings.arguments as Map<String, dynamic>;
+            return MaterialPageRoute(
+              builder:
+                  (_) => BookViewerScreen(
+                    bookUrl: args['url'] as String,
+                    title: args['title'] as String,
+                  ),
+            );
           case '/topics_list':
             final args = settings.arguments as Map<String, dynamic>;
             return MaterialPageRoute(
@@ -162,12 +173,18 @@ class KidsLearningApp extends StatelessWidget {
                     topicName: args['topicName'] as String,
                     levels: args['levels'] as List<Map<String, dynamic>>,
                     subject: args['subject'] as String,
-                    currentUnlockedLevel:
-                        args['currentUnlockedLevel'] as int? ?? 1,
+                    currentUnlockedLevel: args['currentUnlockedLevel'] as int,
                   ),
             );
           default:
-            return null;
+            return MaterialPageRoute(
+              builder:
+                  (_) => Scaffold(
+                    body: Center(
+                      child: Text('No route defined for ${settings.name}'),
+                    ),
+                  ),
+            );
         }
       },
     );
@@ -185,34 +202,28 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    _checkAutoLogin();
+    _checkStatus();
   }
 
-  void _checkAutoLogin() async {
+  Future<void> _checkStatus() async {
     await Future.delayed(const Duration(seconds: 3));
     if (!mounted) return;
 
-    final settings = Hive.box('settingsBox');
-    final email = settings.get('last_user_email');
+    final box = Hive.box('studentBox');
+    final Map? student = box.get('currentStudent');
 
-    if (email != null) {
-      final box = Hive.box('studentBox');
-      final userData = box.get(email);
-      if (userData != null && userData is Map) {
-        String std = userData['standard'] ?? '';
-        int stdInt = int.tryParse(std.replaceAll('Class ', '')) ?? 1;
-        Navigator.pushReplacementNamed(
-          context,
-          '/home',
-          arguments: {
-            'std': stdInt,
-            'avatar': 'husky', // Default or saved avatar
-          },
-        );
-        return;
-      }
+    if (student != null) {
+      String stdText = student['standard'] ?? '';
+      int stdInt = int.tryParse(stdText.replaceAll('Class ', '')) ?? 1;
+
+      Navigator.pushReplacementNamed(
+        context,
+        '/home',
+        arguments: {'std': stdInt, 'avatar': student['avatar'] ?? 'husky'},
+      );
+    } else {
+      Navigator.pushReplacementNamed(context, '/auth');
     }
-    Navigator.pushReplacementNamed(context, '/auth');
   }
 
   @override
@@ -224,20 +235,20 @@ class _SplashScreenState extends State<SplashScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(30),
               decoration: const BoxDecoration(
                 color: Colors.white,
                 shape: BoxShape.circle,
               ),
               child: const Icon(
                 Icons.school_rounded,
-                size: 80,
+                size: 100,
                 color: Color(0xFF8B80F8),
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 30),
             Text(
-              'Kids Learn',
+              'Arivu',
               style: GoogleFonts.outfit(
                 fontSize: 48,
                 fontWeight: FontWeight.bold,

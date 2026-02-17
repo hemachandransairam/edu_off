@@ -543,30 +543,36 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           _buildNavItem(0, Icons.home_rounded),
           _buildNavItem(1, Icons.menu_book_rounded),
-          _buildNavItem(2, Icons.hourglass_empty_rounded),
-          _buildNavItem(3, Icons.person_outline_rounded),
+          _buildNavItem(2, Icons.videogame_asset_rounded),
+          _buildNavItem(3, Icons.person_rounded),
         ],
       ),
     );
   }
 
   Widget _buildNavItem(int index, IconData icon) {
-    final responsive = Responsive(context);
     bool isActive = _currentIndex == index;
+    final responsive = Responsive(context);
 
-    return GestureDetector(
-      onTap: () => setState(() => _currentIndex = index),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
-        padding: responsive.padding(horizontal: 20, vertical: 12),
-        decoration: BoxDecoration(
-          color: isActive ? const Color(0xFFFFC6A5) : Colors.transparent,
-          borderRadius: responsive.borderRadius(30),
-        ),
-        child: Icon(
-          icon,
-          color: isActive ? const Color(0xFF1E293B) : Colors.white60,
-          size: responsive.iconSize(28),
+    return Flexible(
+      child: GestureDetector(
+        onTap: () => setState(() => _currentIndex = index),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          margin: const EdgeInsets.symmetric(horizontal: 4),
+          padding: EdgeInsets.symmetric(
+            horizontal: isActive ? 20 : 12,
+            vertical: 12,
+          ),
+          decoration: BoxDecoration(
+            color: isActive ? const Color(0xFFFFC6A5) : Colors.transparent,
+            borderRadius: BorderRadius.circular(30),
+          ),
+          child: Icon(
+            icon,
+            color: isActive ? const Color(0xFF1E293B) : Colors.white60,
+            size: responsive.iconSize(26),
+          ),
         ),
       ),
     );

@@ -35,76 +35,86 @@ class _CompareGameScreenState extends State<CompareGameScreen> {
         elevation: 0,
         iconTheme: const IconThemeData(color: Color(0xFF1E293B)),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(25.0),
-        child: Column(
-          children: [
-            const SizedBox(height: 40),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Text(
-                currentQ['q'] as String,
-                style: GoogleFonts.outfit(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: const Color(0xFF1E293B),
+      body: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            children: [
+              const SizedBox(height: 30),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 15,
                 ),
-              ),
-            ),
-            const Spacer(),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _buildCircle(currentQ['val1'] as int),
-                _buildCircle(currentQ['val2'] as int),
-              ],
-            ),
-            const Spacer(),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed:
-                    selectedValue == null
-                        ? null
-                        : () {
-                          if (selectedValue == currentQ['ans']) {
-                            if (currentIndex < questions.length - 1) {
-                              setState(() {
-                                currentIndex++;
-                                selectedValue = null;
-                              });
-                            } else {
-                              _showSuccess();
-                            }
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Think again!')),
-                            );
-                          }
-                        },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF1E293B),
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 20),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(25),
-                  ),
-                  elevation: 0,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
-                  'Continue',
+                  currentQ['q'] as String,
                   style: GoogleFonts.outfit(
-                    fontSize: 20,
+                    fontSize: 24,
                     fontWeight: FontWeight.bold,
+                    color: const Color(0xFF1E293B),
+                  ),
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              const SizedBox(height: 60),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  _buildCircle(currentQ['val1'] as int),
+                  _buildCircle(currentQ['val2'] as int),
+                ],
+              ),
+              const SizedBox(height: 60),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed:
+                      selectedValue == null
+                          ? null
+                          : () {
+                            if (selectedValue == currentQ['ans']) {
+                              if (currentIndex < questions.length - 1) {
+                                setState(() {
+                                  currentIndex++;
+                                  selectedValue = null;
+                                });
+                              } else {
+                                _showSuccess();
+                              }
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Think again!')),
+                              );
+                            }
+                          },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF1E293B),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 18),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(25),
+                    ),
+                    elevation: 0,
+                  ),
+                  child: Text(
+                    'Continue',
+                    style: GoogleFonts.outfit(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+              const SizedBox(height: 20),
+            ],
+          ),
         ),
       ),
     );
@@ -229,169 +239,214 @@ class _DragDropGameScreenState extends State<DragDropGameScreen> {
         elevation: 0,
         iconTheme: const IconThemeData(color: Color(0xFF1E293B)),
       ),
-      body: Column(
-        children: [
-          const SizedBox(height: 30),
-          SizedBox(
-            height: 130,
-            child: ListView(
-              scrollDirection: Axis.horizontal,
-              physics: const BouncingScrollPhysics(),
-              padding: const EdgeInsets.symmetric(horizontal: 25),
-              children:
-                  items.map((item) {
-                    return Draggable<Map<String, String>>(
-                      data: item,
-                      feedback: _buildItemCard(item['name']!, true),
-                      childWhenDragging: Opacity(
-                        opacity: 0.3,
+      body: SafeArea(
+        child: Column(
+          children: [
+            const SizedBox(height: 20),
+            SizedBox(
+              height: 110,
+              child: ListView(
+                scrollDirection: Axis.horizontal,
+                physics: const BouncingScrollPhysics(),
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                children:
+                    items.map((item) {
+                      return Draggable<Map<String, String>>(
+                        data: item,
+                        feedback: _buildItemCard(item['name']!, true),
+                        childWhenDragging: Opacity(
+                          opacity: 0.3,
+                          child: _buildItemCard(item['name']!, false),
+                        ),
                         child: _buildItemCard(item['name']!, false),
-                      ),
-                      child: _buildItemCard(item['name']!, false),
-                    );
-                  }).toList(),
+                      );
+                    }).toList(),
+              ),
             ),
-          ),
-          const Spacer(),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children:
-                (widget.data['categories'] as List).map((cat) {
-                  return DragTarget<Map<String, String>>(
-                    onWillAccept: (data) => data != null,
-                    onAccept: (data) {
-                      if (data['cat'] == cat) {
-                        setState(() {
-                          collections[cat]!.add(data['name']!);
-                          items.remove(data);
-                        });
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Wrong category!')),
-                        );
-                      }
-                    },
-                    builder:
-                        (
-                          context,
-                          candidateData,
-                          rejectedData,
-                        ) => AnimatedContainer(
-                          duration: const Duration(milliseconds: 300),
-                          width: 170,
-                          height: 280,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(35),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.04),
-                                blurRadius: 15,
-                                offset: const Offset(0, 8),
-                              ),
-                            ],
-                            border: Border.all(
-                              color:
-                                  candidateData.isNotEmpty
-                                      ? const Color(0xFF8B80F8)
-                                      : Colors.transparent,
-                              width: 3,
+            const SizedBox(height: 20),
+            Expanded(
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                padding: const EdgeInsets.symmetric(horizontal: 15),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children:
+                      (widget.data['categories'] as List).map((cat) {
+                        return Flexible(
+                          child: Container(
+                            constraints: const BoxConstraints(maxWidth: 180),
+                            margin: const EdgeInsets.symmetric(horizontal: 5),
+                            child: DragTarget<Map<String, String>>(
+                              onWillAccept: (data) => data != null,
+                              onAccept: (data) {
+                                if (data['cat'] == cat) {
+                                  setState(() {
+                                    collections[cat]!.add(data['name']!);
+                                    items.remove(data);
+                                  });
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text('Wrong category!'),
+                                    ),
+                                  );
+                                }
+                              },
+                              builder:
+                                  (
+                                    context,
+                                    candidateData,
+                                    rejectedData,
+                                  ) => AnimatedContainer(
+                                    duration: const Duration(milliseconds: 300),
+                                    constraints: const BoxConstraints(
+                                      minHeight: 250,
+                                      maxHeight: 350,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(30),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(0.04),
+                                          blurRadius: 15,
+                                          offset: const Offset(0, 8),
+                                        ),
+                                      ],
+                                      border: Border.all(
+                                        color:
+                                            candidateData.isNotEmpty
+                                                ? const Color(0xFF8B80F8)
+                                                : Colors.transparent,
+                                        width: 3,
+                                      ),
+                                    ),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.all(15.0),
+                                          child: Text(
+                                            cat as String,
+                                            style: GoogleFonts.outfit(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold,
+                                              color: const Color(0xFF1E293B),
+                                            ),
+                                            textAlign: TextAlign.center,
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                        Divider(
+                                          color: Colors.grey[100],
+                                          height: 1,
+                                        ),
+                                        Flexible(
+                                          child: ListView(
+                                            shrinkWrap: true,
+                                            padding: const EdgeInsets.all(8),
+                                            physics:
+                                                const BouncingScrollPhysics(),
+                                            children:
+                                                collections[cat]!
+                                                    .map(
+                                                      (name) => Container(
+                                                        margin:
+                                                            const EdgeInsets.only(
+                                                              bottom: 6,
+                                                            ),
+                                                        padding:
+                                                            const EdgeInsets.all(
+                                                              8,
+                                                            ),
+                                                        decoration: BoxDecoration(
+                                                          color: const Color(
+                                                            0xFFF1F5F9,
+                                                          ),
+                                                          borderRadius:
+                                                              BorderRadius.circular(
+                                                                12,
+                                                              ),
+                                                        ),
+                                                        child: Text(
+                                                          name,
+                                                          textAlign:
+                                                              TextAlign.center,
+                                                          style:
+                                                              GoogleFonts.outfit(
+                                                                fontSize: 14,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500,
+                                                                color:
+                                                                    const Color(
+                                                                      0xFF1E293B,
+                                                                    ),
+                                                              ),
+                                                          maxLines: 2,
+                                                          overflow:
+                                                              TextOverflow
+                                                                  .ellipsis,
+                                                        ),
+                                                      ),
+                                                    )
+                                                    .toList(),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                             ),
                           ),
-                          child: Column(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.all(18.0),
-                                child: Text(
-                                  cat as String,
-                                  style: GoogleFonts.outfit(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                    color: const Color(0xFF1E293B),
-                                  ),
-                                ),
-                              ),
-                              Divider(color: Colors.grey[100], height: 1),
-                              Expanded(
-                                child: ListView(
-                                  padding: const EdgeInsets.all(10),
-                                  physics: const BouncingScrollPhysics(),
-                                  children:
-                                      collections[cat]!
-                                          .map(
-                                            (name) => Container(
-                                              margin: const EdgeInsets.only(
-                                                bottom: 8,
-                                              ),
-                                              padding: const EdgeInsets.all(10),
-                                              decoration: BoxDecoration(
-                                                color: const Color(0xFFF1F5F9),
-                                                borderRadius:
-                                                    BorderRadius.circular(15),
-                                              ),
-                                              child: Text(
-                                                name,
-                                                textAlign: TextAlign.center,
-                                                style: GoogleFonts.outfit(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.w500,
-                                                  color: const Color(
-                                                    0xFF1E293B,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          )
-                                          .toList(),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                  );
-                }).toList(),
-          ),
-          const Spacer(),
-          if (isComplete)
-            Padding(
-              padding: const EdgeInsets.all(40.0),
-              child: SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () => Navigator.pop(context, true),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF1E293B),
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 22),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
+                        );
+                      }).toList(),
+                ),
+              ),
+            ),
+            if (isComplete)
+              Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.pop(context, true),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF1E293B),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 18),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(25),
+                      ),
+                      elevation: 10,
+                      shadowColor: const Color(0xFF1E293B).withOpacity(0.3),
                     ),
-                    elevation: 10,
-                    shadowColor: const Color(0xFF1E293B).withOpacity(0.3),
-                  ),
-                  child: Text(
-                    'Great Job!',
-                    style: GoogleFonts.outfit(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
+                    child: Text(
+                      'Great Job!',
+                      style: GoogleFonts.outfit(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-        ],
+            const SizedBox(height: 10),
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildItemCard(String name, bool isDragging) {
     return Container(
-      width: 110,
-      height: 90,
-      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      width: 100,
+      height: 85,
+      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
       decoration: BoxDecoration(
         color: const Color(0xFF8B80F8),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
             color: const Color(0xFF8B80F8).withOpacity(0.3),
@@ -401,14 +456,19 @@ class _DragDropGameScreenState extends State<DragDropGameScreen> {
         ],
       ),
       child: Center(
-        child: Text(
-          name,
-          style: GoogleFonts.outfit(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text(
+            name,
+            style: GoogleFonts.outfit(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+            ),
+            textAlign: TextAlign.center,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
           ),
-          textAlign: TextAlign.center,
         ),
       ),
     );
@@ -446,127 +506,134 @@ class _FillBlanksGameScreenState extends State<FillBlanksGameScreen> {
         elevation: 0,
         iconTheme: const IconThemeData(color: Color(0xFF1E293B)),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(25.0),
-        child: Column(
-          children: [
-            const SizedBox(height: 50),
-            Container(
-              padding: const EdgeInsets.all(30),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(35),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.04),
-                    blurRadius: 15,
-                    offset: const Offset(0, 8),
-                  ),
-                ],
-              ),
-              child: Text(
-                currentQ['text'].replaceAll('____', selectedOption ?? '....'),
-                textAlign: TextAlign.center,
-                style: GoogleFonts.outfit(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: const Color(0xFF1E293B),
-                  height: 1.4,
-                ),
-              ),
-            ),
-            const Spacer(),
-            Wrap(
-              spacing: 15,
-              runSpacing: 15,
-              alignment: WrapAlignment.center,
-              children:
-                  (currentQ['options'] as List).map((opt) {
-                    bool isSelected = selectedOption == opt;
-                    return GestureDetector(
-                      onTap: () => setState(() => selectedOption = opt),
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 300),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 25,
-                          vertical: 15,
-                        ),
-                        decoration: BoxDecoration(
-                          color:
-                              isSelected
-                                  ? const Color(0xFF8B80F8)
-                                  : Colors.white,
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(
-                              color:
-                                  isSelected
-                                      ? const Color(0xFF8B80F8).withOpacity(0.3)
-                                      : Colors.black.withOpacity(0.03),
-                              blurRadius: 10,
-                              offset: const Offset(0, 5),
-                            ),
-                          ],
-                        ),
-                        child: Text(
-                          opt as String,
-                          style: GoogleFonts.outfit(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color:
-                                isSelected
-                                    ? Colors.white
-                                    : const Color(0xFF1E293B),
-                          ),
-                        ),
-                      ),
-                    );
-                  }).toList(),
-            ),
-            const SizedBox(height: 60),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed:
-                    selectedOption == null
-                        ? null
-                        : () {
-                          if (selectedOption == currentQ['ans']) {
-                            if (currentIndex < questions.length - 1) {
-                              setState(() {
-                                currentIndex++;
-                                selectedOption = null;
-                              });
-                            } else {
-                              _showSuccess();
-                            }
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Try another one!')),
-                            );
-                          }
-                        },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF1E293B),
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 22),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  elevation: 0,
-                  disabledBackgroundColor: Colors.grey[300],
+      body: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            children: [
+              const SizedBox(height: 30),
+              Container(
+                padding: const EdgeInsets.all(25),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(30),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.04),
+                      blurRadius: 15,
+                      offset: const Offset(0, 8),
+                    ),
+                  ],
                 ),
                 child: Text(
-                  'Check Answer',
+                  currentQ['text'].replaceAll('____', selectedOption ?? '....'),
+                  textAlign: TextAlign.center,
                   style: GoogleFonts.outfit(
-                    fontSize: 20,
+                    fontSize: 22,
                     fontWeight: FontWeight.bold,
+                    color: const Color(0xFF1E293B),
+                    height: 1.4,
                   ),
                 ),
               ),
-            ),
-            const SizedBox(height: 20),
-          ],
+              const SizedBox(height: 40),
+              Wrap(
+                spacing: 12,
+                runSpacing: 12,
+                alignment: WrapAlignment.center,
+                children:
+                    (currentQ['options'] as List).map((opt) {
+                      bool isSelected = selectedOption == opt;
+                      return GestureDetector(
+                        onTap: () => setState(() => selectedOption = opt),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 300),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 12,
+                          ),
+                          decoration: BoxDecoration(
+                            color:
+                                isSelected
+                                    ? const Color(0xFF8B80F8)
+                                    : Colors.white,
+                            borderRadius: BorderRadius.circular(18),
+                            boxShadow: [
+                              BoxShadow(
+                                color:
+                                    isSelected
+                                        ? const Color(
+                                          0xFF8B80F8,
+                                        ).withOpacity(0.3)
+                                        : Colors.black.withOpacity(0.03),
+                                blurRadius: 10,
+                                offset: const Offset(0, 5),
+                              ),
+                            ],
+                          ),
+                          child: Text(
+                            opt as String,
+                            style: GoogleFonts.outfit(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color:
+                                  isSelected
+                                      ? Colors.white
+                                      : const Color(0xFF1E293B),
+                            ),
+                          ),
+                        ),
+                      );
+                    }).toList(),
+              ),
+              const SizedBox(height: 50),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed:
+                      selectedOption == null
+                          ? null
+                          : () {
+                            if (selectedOption == currentQ['ans']) {
+                              if (currentIndex < questions.length - 1) {
+                                setState(() {
+                                  currentIndex++;
+                                  selectedOption = null;
+                                });
+                              } else {
+                                _showSuccess();
+                              }
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Try another one!'),
+                                ),
+                              );
+                            }
+                          },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF1E293B),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 20),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(25),
+                    ),
+                    elevation: 0,
+                    disabledBackgroundColor: Colors.grey[300],
+                  ),
+                  child: Text(
+                    'Check Answer',
+                    style: GoogleFonts.outfit(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+            ],
+          ),
         ),
       ),
     );
@@ -839,7 +906,8 @@ class _MatchGameScreenState extends State<MatchGameScreen> {
                         color: const Color(0xFF1E293B),
                         fontSize: 15,
                       ),
-                      overflow: TextOverflow.visible,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                 ],
@@ -961,6 +1029,8 @@ class _MatchGameScreenState extends State<MatchGameScreen> {
                     color: const Color(0xFF1E293B),
                     fontSize: 15,
                   ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ),
@@ -1162,143 +1232,152 @@ class _LessonGameScreenState extends State<LessonGameScreen> {
         iconTheme: const IconThemeData(color: Color(0xFF1E293B)),
         title: Text(
           'Lesson Quiz',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
           style: GoogleFonts.outfit(
             fontWeight: FontWeight.bold,
             color: const Color(0xFF1E293B),
           ),
         ),
       ),
-      body: Column(
-        children: [
-          LinearProgressIndicator(
-            value: (curIdx + 1) / qs.length,
-            backgroundColor: Colors.white,
-            color: const Color(0xFF8B80F8),
-            minHeight: 6,
-          ),
-          const SizedBox(height: 30),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 25.0),
-            child: Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(35),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(35),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.04),
-                    blurRadius: 15,
-                    offset: const Offset(0, 8),
+      body: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        child: Column(
+          children: [
+            LinearProgressIndicator(
+              value: (curIdx + 1) / qs.length,
+              backgroundColor: Colors.white,
+              color: const Color(0xFF8B80F8),
+              minHeight: 6,
+            ),
+            const SizedBox(height: 25),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(25),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(30),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.04),
+                      blurRadius: 15,
+                      offset: const Offset(0, 8),
+                    ),
+                  ],
+                ),
+                child: Text(
+                  q['q'] as String,
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.outfit(
+                    fontSize: 24, // Reduced from 32
+                    fontWeight: FontWeight.bold,
+                    color: const Color(0xFF1E293B),
                   ),
-                ],
-              ),
-              child: Text(
-                q['q'] as String,
-                textAlign: TextAlign.center,
-                style: GoogleFonts.outfit(
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                  color: const Color(0xFF1E293B),
                 ),
               ),
             ),
-          ),
-          const Spacer(),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 25.0),
-            child: Column(
-              children:
-                  (q['opt'] as List<String>).map((opt) {
-                    bool isSel = selAns == opt;
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 16.0),
-                      child: GestureDetector(
-                        onTap: () => setState(() => selAns = opt),
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 300),
-                          width: double.infinity,
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 20,
-                            horizontal: 20,
-                          ),
-                          decoration: BoxDecoration(
-                            color:
-                                isSel ? const Color(0xFF8B80F8) : Colors.white,
-                            borderRadius: BorderRadius.circular(20),
-                            boxShadow: [
-                              BoxShadow(
-                                color:
-                                    isSel
-                                        ? const Color(
-                                          0xFF8B80F8,
-                                        ).withOpacity(0.3)
-                                        : Colors.black.withOpacity(0.02),
-                                blurRadius: 10,
-                                offset: const Offset(0, 5),
-                              ),
-                            ],
-                          ),
-                          child: Text(
-                            opt,
-                            textAlign: TextAlign.center,
-                            style: GoogleFonts.outfit(
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
+            const SizedBox(height: 30),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: Column(
+                children:
+                    (q['opt'] as List<String>).map((opt) {
+                      bool isSel = selAns == opt;
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 12.0),
+                        child: GestureDetector(
+                          onTap: () => setState(() => selAns = opt),
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 300),
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 18,
+                              horizontal: 20,
+                            ),
+                            decoration: BoxDecoration(
                               color:
                                   isSel
-                                      ? Colors.white
-                                      : const Color(0xFF1E293B),
+                                      ? const Color(0xFF8B80F8)
+                                      : Colors.white,
+                              borderRadius: BorderRadius.circular(20),
+                              boxShadow: [
+                                BoxShadow(
+                                  color:
+                                      isSel
+                                          ? const Color(
+                                            0xFF8B80F8,
+                                          ).withOpacity(0.3)
+                                          : Colors.black.withOpacity(0.02),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 5),
+                                ),
+                              ],
+                            ),
+                            child: Text(
+                              opt,
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.outfit(
+                                fontSize: 18, // Reduced from 22
+                                fontWeight: FontWeight.bold,
+                                color:
+                                    isSel
+                                        ? Colors.white
+                                        : const Color(0xFF1E293B),
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                         ),
-                      ),
-                    );
-                  }).toList(),
+                      );
+                    }).toList(),
+              ),
             ),
-          ),
-          const SizedBox(height: 30),
-          Padding(
-            padding: const EdgeInsets.all(25.0),
-            child: SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed:
-                    selAns == null
-                        ? null
-                        : () =>
-                            selAns == q['a']
-                                ? (curIdx < qs.length - 1
-                                    ? setState(() {
-                                      curIdx++;
-                                      selAns = null;
-                                    })
-                                    : _showSuccess())
-                                : ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text('Try again!')),
-                                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF1E293B),
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 22),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
+            const SizedBox(height: 25),
+            Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed:
+                      selAns == null
+                          ? null
+                          : () =>
+                              selAns == q['a']
+                                  ? (curIdx < qs.length - 1
+                                      ? setState(() {
+                                        curIdx++;
+                                        selAns = null;
+                                      })
+                                      : _showSuccess())
+                                  : ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text('Try again!')),
+                                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF1E293B),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 20),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(25),
+                    ),
+                    elevation: 0,
+                    disabledBackgroundColor: Colors.grey[300],
                   ),
-                  elevation: 0,
-                  disabledBackgroundColor: Colors.grey[300],
-                ),
-                child: Text(
-                  'Continue',
-                  style: GoogleFonts.outfit(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+                  child: Text(
+                    'Continue',
+                    style: GoogleFonts.outfit(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-          const SizedBox(height: 20),
-        ],
+            const SizedBox(height: 20),
+          ],
+        ),
       ),
     );
   }
@@ -1392,112 +1471,119 @@ class _MultiplicationGameScreenState extends State<MultiplicationGameScreen> {
         elevation: 0,
         iconTheme: const IconThemeData(color: Color(0xFF1E293B)),
       ),
-      body: Column(
-        children: [
-          const SizedBox(height: 60),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 30),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(35),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.04),
-                  blurRadius: 15,
-                  offset: const Offset(0, 8),
+      body: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        child: Column(
+          children: [
+            const SizedBox(height: 40),
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 20),
+              padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 25),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(30),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.04),
+                    blurRadius: 15,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
+              ),
+              child: Text(
+                '$n1 × $n2 = ?',
+                style: GoogleFonts.outfit(
+                  fontSize: 48, // Reduced from 64
+                  fontWeight: FontWeight.bold,
+                  color: const Color(0xFF8B80F8),
                 ),
-              ],
-            ),
-            child: Text(
-              '$n1 × $n2 = ?',
-              style: GoogleFonts.outfit(
-                fontSize: 64,
-                fontWeight: FontWeight.bold,
-                color: const Color(0xFF8B80F8),
               ),
             ),
-          ),
-          const Spacer(),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 25.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children:
-                  opts.map((opt) {
-                    bool isSel = ans == opt;
-                    return GestureDetector(
-                      onTap: () => setState(() => ans = opt),
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 300),
-                        width: 95,
-                        height: 95,
-                        decoration: BoxDecoration(
-                          color: isSel ? const Color(0xFF8B80F8) : Colors.white,
-                          borderRadius: BorderRadius.circular(25),
-                          boxShadow: [
-                            BoxShadow(
-                              color:
-                                  isSel
-                                      ? const Color(0xFF8B80F8).withOpacity(0.3)
-                                      : Colors.black.withOpacity(0.03),
-                              blurRadius: 10,
-                              offset: const Offset(0, 5),
-                            ),
-                          ],
-                        ),
-                        child: Center(
-                          child: Text(
-                            '$opt',
-                            style: GoogleFonts.outfit(
-                              fontSize: 34,
-                              fontWeight: FontWeight.bold,
-                              color:
-                                  isSel
-                                      ? Colors.white
-                                      : const Color(0xFF1E293B),
+            const SizedBox(height: 60),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children:
+                    opts.map((opt) {
+                      bool isSel = ans == opt;
+                      return GestureDetector(
+                        onTap: () => setState(() => ans = opt),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 300),
+                          width: 85, // Reduced from 95
+                          height: 85, // Reduced from 95
+                          decoration: BoxDecoration(
+                            color:
+                                isSel ? const Color(0xFF8B80F8) : Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: [
+                              BoxShadow(
+                                color:
+                                    isSel
+                                        ? const Color(
+                                          0xFF8B80F8,
+                                        ).withOpacity(0.3)
+                                        : Colors.black.withOpacity(0.03),
+                                blurRadius: 10,
+                                offset: const Offset(0, 5),
+                              ),
+                            ],
+                          ),
+                          child: Center(
+                            child: Text(
+                              '$opt',
+                              style: GoogleFonts.outfit(
+                                fontSize: 28, // Reduced from 34
+                                fontWeight: FontWeight.bold,
+                                color:
+                                    isSel
+                                        ? Colors.white
+                                        : const Color(0xFF1E293B),
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    );
-                  }).toList(),
+                      );
+                    }).toList(),
+              ),
             ),
-          ),
-          const Spacer(),
-          Padding(
-            padding: const EdgeInsets.all(25.0),
-            child: SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed:
-                    ans == null
-                        ? null
-                        : () =>
-                            ans == correct
-                                ? _showResult(true)
-                                : _showResult(false),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF1E293B),
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 22),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
+            const SizedBox(height: 60),
+            Padding(
+              padding: const EdgeInsets.all(25.0),
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed:
+                      ans == null
+                          ? null
+                          : () =>
+                              ans == correct
+                                  ? _showResult(true)
+                                  : _showResult(false),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF1E293B),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 20),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(25),
+                    ),
+                    elevation: 0,
+                    disabledBackgroundColor: Colors.grey[300],
                   ),
-                  elevation: 0,
-                  disabledBackgroundColor: Colors.grey[300],
-                ),
-                child: Text(
-                  'Check Answer',
-                  style: GoogleFonts.outfit(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+                  child: Text(
+                    'Check Answer',
+                    style: GoogleFonts.outfit(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-          const SizedBox(height: 20),
-        ],
+            const SizedBox(height: 20),
+          ],
+        ),
       ),
     );
   }
@@ -1566,120 +1652,131 @@ class _QuantityGameScreenState extends State<QuantityGameScreen> {
         elevation: 0,
         iconTheme: const IconThemeData(color: Color(0xFF1E293B)),
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: Center(
-              child: Container(
-                margin: const EdgeInsets.all(25),
-                padding: const EdgeInsets.all(30),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(35),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.04),
-                      blurRadius: 20,
-                    ),
-                  ],
-                ),
-                child: Wrap(
-                  spacing: 20,
-                  runSpacing: 20,
-                  children: List.generate(
-                    count,
-                    (i) => const Icon(
-                      Icons.favorite,
-                      size: 60,
-                      color: Color(0xFFFFC6A5),
+      body: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        child: Column(
+          children: [
+            Container(
+              margin: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(20),
+              constraints: const BoxConstraints(minHeight: 200, maxHeight: 300),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(30),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.04),
+                    blurRadius: 20,
+                  ),
+                ],
+              ),
+              child: SingleChildScrollView(
+                child: Center(
+                  child: Wrap(
+                    spacing: 15,
+                    runSpacing: 15,
+                    alignment: WrapAlignment.center,
+                    children: List.generate(
+                      count,
+                      (i) => const Icon(
+                        Icons.favorite,
+                        size: 45, // Reduced from 60
+                        color: Color(0xFFFFC6A5),
+                      ),
                     ),
                   ),
                 ),
               ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(25.0),
-            child: Text(
-              'How many hearts? Target: $target',
-              style: GoogleFonts.outfit(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: const Color(0xFF1E293B),
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 20.0,
+                vertical: 10,
+              ),
+              child: Text(
+                'How many hearts? Target: $target',
+                textAlign: TextAlign.center,
+                style: GoogleFonts.outfit(
+                  fontSize: 20, // Reduced from 24
+                  fontWeight: FontWeight.bold,
+                  color: const Color(0xFF1E293B),
+                ),
               ),
             ),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              _ctrl(
-                Icons.remove_rounded,
-                () => count > 0 ? setState(() => count--) : null,
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 40,
-                  vertical: 20,
+            const SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _ctrl(
+                  Icons.remove_rounded,
+                  () => count > 0 ? setState(() => count--) : null,
                 ),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(25),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 10,
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 30,
+                    vertical: 15,
+                  ),
+                  margin: const EdgeInsets.symmetric(horizontal: 20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 10,
+                      ),
+                    ],
+                  ),
+                  child: Text(
+                    '$count',
+                    style: GoogleFonts.outfit(
+                      fontSize: 36, // Reduced from 48
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFF1E293B),
                     ),
-                  ],
-                ),
-                child: Text(
-                  '$count',
-                  style: GoogleFonts.outfit(
-                    fontSize: 48,
-                    fontWeight: FontWeight.bold,
-                    color: const Color(0xFF1E293B),
                   ),
                 ),
-              ),
-              _ctrl(Icons.add_rounded, () => setState(() => count++)),
-            ],
-          ),
-          const SizedBox(height: 40),
-          Padding(
-            padding: const EdgeInsets.all(25.0),
-            child: SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed:
-                    count == target
-                        ? () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Correct!')),
-                          );
-                          Navigator.pop(context);
-                        }
-                        : null,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF1E293B),
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 22),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
+                _ctrl(Icons.add_rounded, () => setState(() => count++)),
+              ],
+            ),
+            const SizedBox(height: 30),
+            Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed:
+                      count == target
+                          ? () {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Correct!')),
+                            );
+                            Navigator.pop(context);
+                          }
+                          : null,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF1E293B),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 20),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(25),
+                    ),
+                    elevation: 0,
+                    disabledBackgroundColor: Colors.grey[300],
                   ),
-                  elevation: 0,
-                  disabledBackgroundColor: Colors.grey[300],
-                ),
-                child: Text(
-                  'Check Answer',
-                  style: GoogleFonts.outfit(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+                  child: Text(
+                    'Check Answer',
+                    style: GoogleFonts.outfit(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-          const SizedBox(height: 20),
-        ],
+            const SizedBox(height: 20),
+          ],
+        ),
       ),
     );
   }
@@ -1731,6 +1828,8 @@ class _ShapesGameScreenState extends State<ShapesGameScreen> {
       appBar: AppBar(
         title: Text(
           'Find the Shape',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
           style: GoogleFonts.outfit(
             fontWeight: FontWeight.bold,
             color: const Color(0xFF1E293B),
@@ -1740,103 +1839,116 @@ class _ShapesGameScreenState extends State<ShapesGameScreen> {
         elevation: 0,
         iconTheme: const IconThemeData(color: Color(0xFF1E293B)),
       ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 40.0),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 15),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Text(
-                'Tap the $target',
-                style: GoogleFonts.outfit(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: const Color(0xFF1E293B),
+      body: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 30.0),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 12,
                 ),
-              ),
-            ),
-          ),
-          const Spacer(),
-          Wrap(
-            spacing: 25,
-            runSpacing: 25,
-            alignment: WrapAlignment.center,
-            children:
-                shps.map((s) {
-                  bool isSel = sel == s['name'];
-                  return GestureDetector(
-                    onTap: () => setState(() => sel = s['name'] as String),
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 300),
-                      width: 130,
-                      height: 130,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(35),
-                        boxShadow: [
-                          BoxShadow(
-                            color:
-                                isSel
-                                    ? const Color(0xFF8B80F8).withOpacity(0.2)
-                                    : Colors.black.withOpacity(0.04),
-                            blurRadius: 15,
-                            offset: const Offset(0, 8),
-                          ),
-                        ],
-                        border: Border.all(
-                          color:
-                              isSel
-                                  ? const Color(0xFF8B80F8)
-                                  : Colors.transparent,
-                          width: 3,
-                        ),
-                      ),
-                      child: Icon(
-                        s['icon'] as IconData,
-                        size: 70,
-                        color:
-                            isSel ? const Color(0xFF8B80F8) : Colors.grey[400],
-                      ),
-                    ),
-                  );
-                }).toList(),
-          ),
-          const Spacer(),
-          Padding(
-            padding: const EdgeInsets.all(25.0),
-            child: SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed:
-                    sel == null
-                        ? null
-                        : () => sel == target ? _show(true) : _show(false),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF1E293B),
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 22),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  elevation: 0,
-                  disabledBackgroundColor: Colors.grey[300],
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
-                  'Check Answer',
+                  'Tap the $target',
                   style: GoogleFonts.outfit(
-                    fontSize: 20,
+                    fontSize: 24, // Reduced from 28
                     fontWeight: FontWeight.bold,
+                    color: const Color(0xFF1E293B),
                   ),
                 ),
               ),
             ),
-          ),
-          const SizedBox(height: 20),
-        ],
+            const SizedBox(height: 20),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: Wrap(
+                spacing: 20,
+                runSpacing: 20,
+                alignment: WrapAlignment.center,
+                children:
+                    shps.map((s) {
+                      bool isSel = sel == s['name'];
+                      return GestureDetector(
+                        onTap: () => setState(() => sel = s['name'] as String),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 300),
+                          width: 110, // Reduced from 130
+                          height: 110, // Reduced from 130
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(30),
+                            boxShadow: [
+                              BoxShadow(
+                                color:
+                                    isSel
+                                        ? const Color(
+                                          0xFF8B80F8,
+                                        ).withOpacity(0.2)
+                                        : Colors.black.withOpacity(0.04),
+                                blurRadius: 15,
+                                offset: const Offset(0, 8),
+                              ),
+                            ],
+                            border: Border.all(
+                              color:
+                                  isSel
+                                      ? const Color(0xFF8B80F8)
+                                      : Colors.transparent,
+                              width: 3,
+                            ),
+                          ),
+                          child: Icon(
+                            s['icon'] as IconData,
+                            size: 60, // Reduced from 70
+                            color:
+                                isSel
+                                    ? const Color(0xFF8B80F8)
+                                    : Colors.grey[400],
+                          ),
+                        ),
+                      );
+                    }).toList(),
+              ),
+            ),
+            const SizedBox(height: 40),
+            Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed:
+                      sel == null
+                          ? null
+                          : () => sel == target ? _show(true) : _show(false),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF1E293B),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 20),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(25),
+                    ),
+                    elevation: 0,
+                    disabledBackgroundColor: Colors.grey[300],
+                  ),
+                  child: Text(
+                    'Check Answer',
+                    style: GoogleFonts.outfit(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+          ],
+        ),
       ),
     );
   }
@@ -1905,109 +2017,116 @@ class _SubtractionGameScreenState extends State<SubtractionGameScreen> {
         elevation: 0,
         iconTheme: const IconThemeData(color: Color(0xFF1E293B)),
       ),
-      body: Column(
-        children: [
-          const SizedBox(height: 60),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 30),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(35),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.04),
-                  blurRadius: 15,
-                  offset: const Offset(0, 8),
+      body: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        child: Column(
+          children: [
+            const SizedBox(height: 40),
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 20),
+              padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 25),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(30),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.04),
+                    blurRadius: 15,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
+              ),
+              child: Text(
+                '$n1 - $n2 = ?',
+                style: GoogleFonts.outfit(
+                  fontSize: 48, // Reduced from 64
+                  fontWeight: FontWeight.bold,
+                  color: const Color(0xFF8B80F8),
                 ),
-              ],
-            ),
-            child: Text(
-              '$n1 - $n2 = ?',
-              style: GoogleFonts.outfit(
-                fontSize: 64,
-                fontWeight: FontWeight.bold,
-                color: const Color(0xFF8B80F8),
               ),
             ),
-          ),
-          const Spacer(),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 25.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children:
-                  opts.map((opt) {
-                    bool isSel = ans == opt;
-                    return GestureDetector(
-                      onTap: () => setState(() => ans = opt),
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 300),
-                        width: 95,
-                        height: 95,
-                        decoration: BoxDecoration(
-                          color: isSel ? const Color(0xFF8B80F8) : Colors.white,
-                          borderRadius: BorderRadius.circular(25),
-                          boxShadow: [
-                            BoxShadow(
-                              color:
-                                  isSel
-                                      ? const Color(0xFF8B80F8).withOpacity(0.3)
-                                      : Colors.black.withOpacity(0.03),
-                              blurRadius: 10,
-                              offset: const Offset(0, 5),
-                            ),
-                          ],
-                        ),
-                        child: Center(
-                          child: Text(
-                            '$opt',
-                            style: GoogleFonts.outfit(
-                              fontSize: 34,
-                              fontWeight: FontWeight.bold,
-                              color:
-                                  isSel
-                                      ? Colors.white
-                                      : const Color(0xFF1E293B),
+            const SizedBox(height: 60),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children:
+                    opts.map((opt) {
+                      bool isSel = ans == opt;
+                      return GestureDetector(
+                        onTap: () => setState(() => ans = opt),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 300),
+                          width: 85, // Reduced from 95
+                          height: 85, // Reduced from 95
+                          decoration: BoxDecoration(
+                            color:
+                                isSel ? const Color(0xFF8B80F8) : Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: [
+                              BoxShadow(
+                                color:
+                                    isSel
+                                        ? const Color(
+                                          0xFF8B80F8,
+                                        ).withOpacity(0.3)
+                                        : Colors.black.withOpacity(0.03),
+                                blurRadius: 10,
+                                offset: const Offset(0, 5),
+                              ),
+                            ],
+                          ),
+                          child: Center(
+                            child: Text(
+                              '$opt',
+                              style: GoogleFonts.outfit(
+                                fontSize: 28, // Reduced from 34
+                                fontWeight: FontWeight.bold,
+                                color:
+                                    isSel
+                                        ? Colors.white
+                                        : const Color(0xFF1E293B),
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    );
-                  }).toList(),
+                      );
+                    }).toList(),
+              ),
             ),
-          ),
-          const Spacer(),
-          Padding(
-            padding: const EdgeInsets.all(25.0),
-            child: SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed:
-                    ans == null
-                        ? null
-                        : () => ans == correct ? _show(true) : _show(false),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF1E293B),
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 22),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
+            const SizedBox(height: 60),
+            Padding(
+              padding: const EdgeInsets.all(25.0),
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed:
+                      ans == null
+                          ? null
+                          : () => ans == correct ? _show(true) : _show(false),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF1E293B),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 20),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(25),
+                    ),
+                    elevation: 0,
+                    disabledBackgroundColor: Colors.grey[300],
                   ),
-                  elevation: 0,
-                  disabledBackgroundColor: Colors.grey[300],
-                ),
-                child: Text(
-                  'Check Answer',
-                  style: GoogleFonts.outfit(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+                  child: Text(
+                    'Check Answer',
+                    style: GoogleFonts.outfit(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-          const SizedBox(height: 20),
-        ],
+            const SizedBox(height: 20),
+          ],
+        ),
       ),
     );
   }

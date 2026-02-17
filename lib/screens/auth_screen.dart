@@ -223,6 +223,7 @@ class ProfilePage extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         Hive.box('settingsBox').delete('last_user_email');
+        Hive.box('studentBox').delete('currentStudent');
         Navigator.of(
           context,
         ).pushNamedAndRemoveUntil('/auth', (route) => false);
@@ -664,6 +665,9 @@ class _AuthPageState extends State<AuthPage> {
 
     final settings = Hive.box('settingsBox');
     settings.put('last_user_email', data['email']);
+
+    final studentBox = Hive.box('studentBox');
+    studentBox.put('currentStudent', data);
 
     String std = data['standard'] ?? '';
     int stdInt = int.tryParse(std.replaceAll('Class ', '')) ?? 1;

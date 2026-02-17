@@ -79,6 +79,9 @@ class SyllabusModel {
       case 1:
         topicsSource = std1Topics;
         break;
+      case 2:
+        topicsSource = std2Topics;
+        break;
       // Add other standards as needed
       default:
         return {};

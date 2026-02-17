@@ -395,6 +395,7 @@ class SubjectSelectionScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final subjects = SyllabusModel.getSubjects();
+    final responsive = Responsive(context);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF3F1FF),
@@ -403,6 +404,7 @@ class SubjectSelectionScreen extends StatelessWidget {
           'Select Subject',
           style: GoogleFonts.outfit(
             fontWeight: FontWeight.bold,
+            fontSize: responsive.sp(20),
             color: const Color(0xFF1E293B),
           ),
         ),
@@ -411,29 +413,33 @@ class SubjectSelectionScreen extends StatelessWidget {
         iconTheme: const IconThemeData(color: Color(0xFF1E293B)),
       ),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 25.0),
+        padding: responsive.padding(horizontal: 25.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 10),
+            SizedBox(height: responsive.gap(10)),
             Text(
               'What do you want to\nlearn today?',
               style: GoogleFonts.outfit(
-                fontSize: 28,
+                fontSize: responsive.sp(28),
                 fontWeight: FontWeight.bold,
                 color: const Color(0xFF1E293B),
                 height: 1.2,
               ),
             ),
-            const SizedBox(height: 30),
+            SizedBox(height: responsive.gap(30)),
             Expanded(
               child: GridView.builder(
-                padding: const EdgeInsets.only(bottom: 30),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 20,
-                  mainAxisSpacing: 20,
-                  childAspectRatio: 0.9,
+                padding: responsive.padding(bottom: 30),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: responsive.gridColumns(
+                    mobile: 2,
+                    tablet: 3,
+                    desktop: 4,
+                  ),
+                  crossAxisSpacing: responsive.gap(15),
+                  mainAxisSpacing: responsive.gap(15),
+                  childAspectRatio: 0.95,
                 ),
                 itemCount: subjects.length,
                 itemBuilder: (context, index) {
@@ -450,6 +456,8 @@ class SubjectSelectionScreen extends StatelessWidget {
 
   Widget _buildSubjectCard(BuildContext context, String subject) {
     final theme = _getSubjectTheme(subject);
+    final responsive = Responsive(context);
+
     return GestureDetector(
       onTap: () {
         if (mode == 'lessons') {
@@ -467,12 +475,13 @@ class SubjectSelectionScreen extends StatelessWidget {
         }
       },
       child: Container(
+        padding: responsive.padding(all: 10),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(35),
+          borderRadius: responsive.borderRadius(30),
           boxShadow: [
             BoxShadow(
-              color: theme['color'].withOpacity(0.1),
+              color: theme['color'].withOpacity(0.08),
               blurRadius: 15,
               offset: const Offset(0, 8),
             ),
@@ -482,21 +491,28 @@ class SubjectSelectionScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              padding: const EdgeInsets.all(18),
+              padding: responsive.padding(all: 15),
               decoration: BoxDecoration(
                 color: theme['color'].withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
-              child: Icon(theme['icon'], color: theme['color'], size: 40),
+              child: Icon(
+                theme['icon'],
+                color: theme['color'],
+                size: responsive.iconSize(35),
+              ),
             ),
-            const SizedBox(height: 15),
+            SizedBox(height: responsive.gap(12)),
             Text(
               subject,
+              textAlign: TextAlign.center,
               style: GoogleFonts.outfit(
-                fontSize: 18,
+                fontSize: responsive.sp(16),
                 fontWeight: FontWeight.bold,
                 color: const Color(0xFF1E293B),
               ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),
@@ -550,6 +566,11 @@ class GamesListScreen extends StatelessWidget {
       subject,
       'games',
     );
+    final topics =
+        standard == 1
+            ? SyllabusModel.getTopics(standard, subject)
+            : <String, List<Map<String, dynamic>>>{};
+    final responsive = Responsive(context);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF3F1FF),
@@ -558,6 +579,7 @@ class GamesListScreen extends StatelessWidget {
           '$subject Games',
           style: GoogleFonts.outfit(
             fontWeight: FontWeight.bold,
+            fontSize: responsive.sp(20),
             color: const Color(0xFF1E293B),
           ),
         ),
@@ -566,58 +588,241 @@ class GamesListScreen extends StatelessWidget {
         iconTheme: const IconThemeData(color: Color(0xFF1E293B)),
       ),
       body:
-          filteredGames.isEmpty
+          (filteredGames.isEmpty && topics.isEmpty)
               ? _buildEmptyState(subject)
+              : standard == 1
+              ? ListView.builder(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 25,
+                  vertical: 15,
+                ),
+                itemCount: topics.length + filteredGames.length,
+                itemBuilder: (context, index) {
+                  if (index < topics.length) {
+                    final topicName = topics.keys.elementAt(index);
+                    final levels = topics[topicName]!;
+                    return _buildTopicCard(context, topicName, levels);
+                  } else {
+                    final game = filteredGames[index - topics.length];
+                    return _buildIndividualGameCard(context, game);
+                  }
+                },
+              )
               : GridView.builder(
-                padding: const EdgeInsets.all(25),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 20,
-                  mainAxisSpacing: 20,
-                  childAspectRatio: 0.85,
+                padding: responsive.padding(all: 25),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: responsive.gridColumns(
+                    mobile: 2,
+                    tablet: 3,
+                    desktop: 4,
+                  ),
+                  crossAxisSpacing: responsive.gap(15),
+                  mainAxisSpacing: responsive.gap(15),
+                  childAspectRatio: 0.88,
                 ),
                 itemCount: filteredGames.length,
                 itemBuilder: (context, index) {
                   final game = filteredGames[index];
-                  return _buildGameCard(context, game);
+                  return _buildGameGridCard(context, game);
                 },
               ),
     );
   }
 
-  Widget _buildGameCard(BuildContext context, Map<String, dynamic> game) {
-    final theme = _getTheme(game);
+  Widget _buildTopicCard(
+    BuildContext context,
+    String topicName,
+    List<Map<String, dynamic>> levels,
+  ) {
+    final theme = _getSubjectTheme(subject);
+    final responsive = Responsive(context);
+    final currentLevel = 1;
+    final totalLevels = levels.length;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 25),
+      padding: const EdgeInsets.all(25),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(35),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 15,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: (theme['color'] as Color).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(18),
+                ),
+                child: Icon(
+                  theme['icon'] as IconData,
+                  color: theme['color'] as Color,
+                  size: 26,
+                ),
+              ),
+              const SizedBox(width: 15),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      topicName,
+                      style: GoogleFonts.outfit(
+                        fontSize: responsive.sp(18),
+                        fontWeight: FontWeight.bold,
+                        color: const Color(0xFF1E293B),
+                      ),
+                    ),
+                    Text(
+                      '$totalLevels Levels',
+                      style: GoogleFonts.outfit(
+                        color: Colors.grey[600],
+                        fontSize: responsive.sp(13),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Stack(
+                alignment: Alignment.center,
+                children: [
+                  SizedBox(
+                    width: 45,
+                    height: 45,
+                    child: CircularProgressIndicator(
+                      value: currentLevel / totalLevels,
+                      backgroundColor: Colors.grey[200],
+                      valueColor: AlwaysStoppedAnimation<Color>(theme['color']),
+                      strokeWidth: 4,
+                    ),
+                  ),
+                  Text(
+                    '$currentLevel/$totalLevels',
+                    style: const TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () {
+                Navigator.pushNamed(
+                  context,
+                  '/level_map',
+                  arguments: {
+                    'topicName': topicName,
+                    'levels': levels,
+                    'subject': subject,
+                    'currentUnlockedLevel': currentLevel,
+                  },
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF1E293B),
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 18),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                elevation: 0,
+              ),
+              child: Text(
+                'Play Adventure',
+                style: GoogleFonts.outfit(fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildIndividualGameCard(
+    BuildContext context,
+    Map<String, dynamic> game,
+  ) {
+    final theme = _getGameTheme(game);
+    final responsive = Responsive(context);
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 25),
+      padding: const EdgeInsets.all(25),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(35),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 15,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: (theme['color'] as Color).withOpacity(0.15),
+              borderRadius: BorderRadius.circular(18),
+            ),
+            child: Icon(
+              theme['icon'] as IconData,
+              color: theme['color'] as Color,
+              size: 26,
+            ),
+          ),
+          const SizedBox(width: 15),
+          Expanded(
+            child: Text(
+              game['title'] as String,
+              style: GoogleFonts.outfit(
+                fontSize: responsive.sp(17),
+                fontWeight: FontWeight.bold,
+                color: const Color(0xFF1E293B),
+              ),
+            ),
+          ),
+          IconButton(
+            onPressed: () => _onGameTap(context, game),
+            icon: const Icon(
+              Icons.play_circle_fill_rounded,
+              size: 45,
+              color: Color(0xFF1E293B),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildGameGridCard(BuildContext context, Map<String, dynamic> game) {
+    final theme = _getGameTheme(game);
+    final responsive = Responsive(context);
+
     return GestureDetector(
-      onTap: () {
-        final type = game['type'];
-        if (type == 'match') {
-          Navigator.pushNamed(context, '/game_match', arguments: game['data']);
-        } else if (type == 'fill_blanks') {
-          Navigator.pushNamed(
-            context,
-            '/game_fill_blanks',
-            arguments: game['data'],
-          );
-        } else if (type == 'compare') {
-          Navigator.pushNamed(
-            context,
-            '/game_compare',
-            arguments: game['data'],
-          );
-        } else if (type == 'drag_drop') {
-          Navigator.pushNamed(
-            context,
-            '/game_drag_drop',
-            arguments: game['data'],
-          );
-        } else {
-          Navigator.pushNamed(context, game['route'] as String? ?? '/');
-        }
-      },
+      onTap: () => _onGameTap(context, game),
       child: Container(
+        padding: responsive.padding(all: 10),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(35),
+          borderRadius: responsive.borderRadius(30),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.04),
@@ -630,25 +835,28 @@ class GamesListScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              padding: const EdgeInsets.all(20),
+              padding: responsive.padding(all: 15),
               decoration: BoxDecoration(
-                color: (theme['color'] as Color).withOpacity(0.2),
+                color: (theme['color'] as Color).withOpacity(0.15),
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 theme['icon'] as IconData,
-                size: 45,
+                size: responsive.iconSize(38),
                 color: theme['color'] as Color,
               ),
             ),
-            const SizedBox(height: 18),
+            SizedBox(height: responsive.gap(12)),
             Text(
               game['title'] as String,
+              textAlign: TextAlign.center,
               style: GoogleFonts.outfit(
-                fontSize: 18,
+                fontSize: responsive.sp(15),
                 fontWeight: FontWeight.bold,
                 color: const Color(0xFF1E293B),
               ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),
@@ -656,33 +864,47 @@ class GamesListScreen extends StatelessWidget {
     );
   }
 
-  Map<String, dynamic> _getTheme(Map<String, dynamic> game) {
+  void _onGameTap(BuildContext context, Map<String, dynamic> game) {
+    final type = game['type'];
+    if (type == 'match') {
+      Navigator.pushNamed(context, '/game_match', arguments: game['data']);
+    } else if (type == 'fill_blanks') {
+      Navigator.pushNamed(
+        context,
+        '/game_fill_blanks',
+        arguments: game['data'],
+      );
+    } else if (type == 'compare') {
+      Navigator.pushNamed(context, '/game_compare', arguments: game['data']);
+    } else if (type == 'drag_drop') {
+      Navigator.pushNamed(context, '/game_drag_drop', arguments: game['data']);
+    } else {
+      Navigator.pushNamed(context, game['route'] as String? ?? '/');
+    }
+  }
+
+  Map<String, dynamic> _getGameTheme(Map<String, dynamic> game) {
     if (game.containsKey('color') && game.containsKey('icon')) {
       return {'color': game['color'], 'icon': game['icon']};
     }
+    return _getSubjectTheme(game['subject'] as String);
+  }
 
-    final subject = game['subject'] as String;
+  Map<String, dynamic> _getSubjectTheme(String subject) {
     switch (subject) {
       case 'Tamil':
-        return {'icon': Icons.language_rounded, 'color': Colors.orange[400]};
+        return {'icon': Icons.language_rounded, 'color': Colors.orange[400]!};
       case 'English':
-        return {'icon': Icons.abc_rounded, 'color': Colors.blue[400]};
+        return {'icon': Icons.abc_rounded, 'color': Colors.blue[400]!};
       case 'Maths':
-        return {'icon': Icons.calculate_rounded, 'color': Colors.green[400]};
+        return {'icon': Icons.calculate_rounded, 'color': Colors.green[400]!};
       case 'EVS':
         return {
           'icon': Icons.nature_people_rounded,
           'color': Colors.orangeAccent,
         };
       case 'Art & Craft':
-        return {'icon': Icons.palette_rounded, 'color': Colors.pink[400]};
-      case 'Music':
-        return {'icon': Icons.music_note_rounded, 'color': Colors.purple[400]};
-      case 'PE':
-        return {
-          'icon': Icons.fitness_center_rounded,
-          'color': Colors.teal[400],
-        };
+        return {'icon': Icons.palette_rounded, 'color': Colors.pink[400]!};
       default:
         return {'icon': Icons.games_rounded, 'color': Colors.blueGrey};
     }
@@ -742,14 +964,11 @@ class LessonsListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Get topics for this subject
-    final topics = SyllabusModel.getTopics(standard, subject);
-
     return Scaffold(
       backgroundColor: const Color(0xFFF3F1FF),
       appBar: AppBar(
         title: Text(
-          '$subject Lessons',
+          '$subject Gallery',
           style: GoogleFonts.outfit(
             fontWeight: FontWeight.bold,
             color: const Color(0xFF1E293B),
@@ -760,20 +979,180 @@ class LessonsListScreen extends StatelessWidget {
         iconTheme: const IconThemeData(color: Color(0xFF1E293B)),
       ),
       body:
-          topics.isEmpty
-              ? _buildEmptyLessons(subject)
-              : ListView.builder(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 25,
-                  vertical: 15,
+          standard == 1 ? _buildBookLibrary(context) : _buildTopicList(context),
+    );
+  }
+
+  Widget _buildTopicList(BuildContext context) {
+    final topics = SyllabusModel.getTopics(standard, subject);
+    return topics.isEmpty
+        ? _buildEmptyLessons(subject)
+        : ListView.builder(
+          padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 15),
+          itemCount: topics.length,
+          itemBuilder: (context, index) {
+            final topicName = topics.keys.elementAt(index);
+            final levels = topics[topicName]!;
+            return _buildTopicCard(context, topicName, levels);
+          },
+        );
+  }
+
+  Widget _buildBookLibrary(BuildContext context) {
+    final theme = _getTheme(subject);
+
+    // Placeholder books for Standard 1
+    final books = [
+      {
+        'title': '$subject Textbook',
+        'term': 'Term 1',
+        'icon': Icons.menu_book_rounded,
+        'url':
+            subject == 'English'
+                ? 'https://drive.google.com/file/d/1h1AWWPrB3l1YGT3x_xlr02WtKVLEafv5/view?usp=drive_link'
+                : '',
+      },
+      {
+        'title': '$subject Textbook',
+        'term': 'Term 2',
+        'icon': Icons.menu_book_rounded,
+        'url': '',
+      },
+      {
+        'title': '$subject Textbook',
+        'term': 'Term 3',
+        'icon': Icons.menu_book_rounded,
+        'url': '',
+      },
+    ];
+
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(25.0),
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: (theme['color'] as Color).withOpacity(0.1),
+              borderRadius: BorderRadius.circular(25),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.library_books_rounded,
+                  color: theme['color'] as Color,
+                  size: 30,
                 ),
-                itemCount: topics.length,
-                itemBuilder: (context, index) {
-                  final topicName = topics.keys.elementAt(index);
-                  final levels = topics[topicName]!;
-                  return _buildTopicCard(context, topicName, levels);
-                },
-              ),
+                const SizedBox(width: 15),
+                Expanded(
+                  child: Text(
+                    'Read your school books here!',
+                    style: GoogleFonts.outfit(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: const Color(0xFF1E293B),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        Expanded(
+          child: ListView.builder(
+            padding: const EdgeInsets.symmetric(horizontal: 25),
+            itemCount: books.length,
+            itemBuilder: (context, index) {
+              final book = books[index];
+              return Container(
+                margin: const EdgeInsets.only(bottom: 20),
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(30),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.03),
+                      blurRadius: 10,
+                      offset: const Offset(0, 5),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(15),
+                      decoration: BoxDecoration(
+                        color: (theme['color'] as Color).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Icon(
+                        book['icon'] as IconData,
+                        color: theme['color'] as Color,
+                        size: 30,
+                      ),
+                    ),
+                    const SizedBox(width: 20),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            book['title'] as String,
+                            style: GoogleFonts.outfit(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                              color: const Color(0xFF1E293B),
+                            ),
+                          ),
+                          Text(
+                            book['term'] as String,
+                            style: GoogleFonts.outfit(
+                              color: Colors.grey[600],
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        if (book['url'] != '') {
+                          Navigator.pushNamed(
+                            context,
+                            '/book_viewer',
+                            arguments: {
+                              'url': book['url'],
+                              'title': '${book['term']} ${book['title']}',
+                            },
+                          );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                'This book content is coming soon!',
+                              ),
+                            ),
+                          );
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF1E293B),
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                      ),
+                      child: const Text('Read'),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 
@@ -783,6 +1162,7 @@ class LessonsListScreen extends StatelessWidget {
     List<Map<String, dynamic>> levels,
   ) {
     final theme = _getTheme(subject);
+    final responsive = Responsive(context);
 
     // Calculate progress (for now, assume level 1 is unlocked)
     final currentLevel = 1; // TODO: Load from user progress
@@ -827,17 +1207,19 @@ class LessonsListScreen extends StatelessWidget {
                     Text(
                       topicName,
                       style: GoogleFonts.outfit(
-                        fontSize: 20,
+                        fontSize: responsive.sp(18),
                         fontWeight: FontWeight.bold,
                         color: const Color(0xFF1E293B),
                       ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                     Text(
                       '$totalLevels Levels',
                       style: GoogleFonts.outfit(
                         color: Colors.grey[600],
                         fontWeight: FontWeight.w500,
-                        fontSize: 14,
+                        fontSize: responsive.sp(13),
                       ),
                     ),
                   ],
@@ -1004,6 +1386,7 @@ class TopicsListScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     // Get topics for this subject from std1Topics
     final topics = _getTopicsForSubject(subject);
+    final responsive = Responsive(context);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF3F1FF),
@@ -1023,12 +1406,16 @@ class TopicsListScreen extends StatelessWidget {
           topics.isEmpty
               ? _buildEmptyState(subject)
               : GridView.builder(
-                padding: const EdgeInsets.all(25),
+                padding: responsive.padding(all: 25),
                 physics: const BouncingScrollPhysics(),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 20,
-                  mainAxisSpacing: 20,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: responsive.gridColumns(
+                    mobile: 2,
+                    tablet: 3,
+                    desktop: 4,
+                  ),
+                  crossAxisSpacing: responsive.gap(20),
+                  mainAxisSpacing: responsive.gap(20),
                   childAspectRatio: 0.85,
                 ),
                 itemCount: topics.length,
@@ -1047,6 +1434,8 @@ class TopicsListScreen extends StatelessWidget {
     List<Map<String, dynamic>> levels,
   ) {
     final theme = _getTheme(subject);
+    final responsive = Responsive(context);
+
     return GestureDetector(
       onTap: () {
         Navigator.pushNamed(
@@ -1063,7 +1452,7 @@ class TopicsListScreen extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(35),
+          borderRadius: responsive.borderRadius(35),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.04),
@@ -1073,12 +1462,12 @@ class TopicsListScreen extends StatelessWidget {
           ],
         ),
         child: Padding(
-          padding: const EdgeInsets.all(20.0),
+          padding: responsive.padding(all: 15.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                padding: const EdgeInsets.all(18),
+                padding: responsive.padding(all: 15),
                 decoration: BoxDecoration(
                   color: (theme['color'] as Color).withOpacity(0.1),
                   shape: BoxShape.circle,
@@ -1086,34 +1475,36 @@ class TopicsListScreen extends StatelessWidget {
                 child: Icon(
                   theme['icon'] as IconData,
                   color: theme['color'] as Color,
-                  size: 40,
+                  size: responsive.iconSize(35),
                 ),
               ),
-              const SizedBox(height: 15),
+              SizedBox(height: responsive.gap(12)),
               Text(
                 topicName,
                 textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
                 style: GoogleFonts.outfit(
-                  fontSize: 16,
+                  fontSize: responsive.sp(15),
                   fontWeight: FontWeight.bold,
                   color: const Color(0xFF1E293B),
                   height: 1.2,
                 ),
               ),
-              const SizedBox(height: 8),
+              SizedBox(height: responsive.gap(8)),
               Container(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 6,
+                  horizontal: 10,
+                  vertical: 4,
                 ),
                 decoration: BoxDecoration(
                   color: (theme['color'] as Color).withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(15),
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
                   '${levels.length} Levels',
                   style: GoogleFonts.outfit(
-                    fontSize: 12,
+                    fontSize: responsive.sp(11),
                     fontWeight: FontWeight.bold,
                     color: theme['color'] as Color,
                   ),

@@ -78,21 +78,26 @@ class _TracingScreenState extends State<TracingScreen> {
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
                               widget.topic,
                               style: GoogleFonts.outfit(
                                 fontWeight: FontWeight.bold,
-                                fontSize: responsive.sp(20),
+                                fontSize: responsive.sp(18),
                                 color: Colors.white,
                               ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
                             Text(
                               '${widget.language} Letters',
                               style: GoogleFonts.outfit(
-                                fontSize: responsive.sp(14),
+                                fontSize: responsive.sp(13),
                                 color: Colors.white.withOpacity(0.9),
                               ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ],
                         ),
@@ -153,71 +158,77 @@ class _TracingScreenState extends State<TracingScreen> {
               ),
             ),
 
-            SizedBox(height: responsive.gap(20)),
+            SizedBox(height: responsive.gap(15)),
 
             // Current letter display card
-            Container(
-              margin: responsive.padding(horizontal: 20),
-              padding: responsive.padding(all: 25),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    const Color(0xFF8B80F8).withOpacity(0.1),
-                    const Color(0xFF6B58F2).withOpacity(0.05),
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: responsive.borderRadius(25),
-                border: Border.all(
-                  color: const Color(0xFF8B80F8).withOpacity(0.3),
-                  width: 2,
-                ),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF8B80F8).withOpacity(0.1),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      Icons.edit_rounded,
-                      color: const Color(0xFF8B80F8),
-                      size: responsive.iconSize(24),
-                    ),
-                  ),
-                  const SizedBox(width: 15),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Trace this letter',
-                        style: GoogleFonts.outfit(
-                          fontSize: responsive.sp(14),
-                          color: Colors.grey[600],
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      const SizedBox(height: 5),
-                      Text(
-                        currentLetter,
-                        style: GoogleFonts.notoSansTamil(
-                          fontSize: responsive.sp(48),
-                          fontWeight: FontWeight.bold,
-                          color: const Color(0xFF8B80F8),
-                          height: 1,
-                        ),
-                      ),
+            Flexible(
+              flex: 0,
+              child: Container(
+                margin: responsive.padding(horizontal: 20),
+                padding: responsive.padding(all: 20),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      const Color(0xFF8B80F8).withOpacity(0.1),
+                      const Color(0xFF6B58F2).withOpacity(0.05),
                     ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
                   ),
-                ],
+                  borderRadius: responsive.borderRadius(25),
+                  border: Border.all(
+                    color: const Color(0xFF8B80F8).withOpacity(0.3),
+                    width: 2,
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF8B80F8).withOpacity(0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.edit_rounded,
+                        color: const Color(0xFF8B80F8),
+                        size: responsive.iconSize(24),
+                      ),
+                    ),
+                    const SizedBox(width: 15),
+                    Flexible(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'Trace this letter',
+                            style: GoogleFonts.outfit(
+                              fontSize: responsive.sp(14),
+                              color: Colors.grey[600],
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          const SizedBox(height: 5),
+                          Text(
+                            currentLetter,
+                            style: GoogleFonts.notoSansTamil(
+                              fontSize: responsive.sp(40),
+                              fontWeight: FontWeight.bold,
+                              color: const Color(0xFF8B80F8),
+                              height: 1,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
 
-            SizedBox(height: responsive.gap(20)),
+            SizedBox(height: responsive.gap(15)),
 
             // Tracing canvas
             Expanded(
