@@ -4,7 +4,7 @@ import '../utils/responsive.dart';
 import 'dart:ui' as ui;
 import 'dart:typed_data';
 import 'package:flutter/rendering.dart';
-import 'package:image_gallery_saver/image_gallery_saver.dart';
+import 'package:gal/gal.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class DrawingScreen extends StatefulWidget {
@@ -526,73 +526,70 @@ class _DrawingScreenState extends State<DrawingScreen> {
       );
       Uint8List pngBytes = byteData!.buffer.asUint8List();
 
-      // Save to gallery
-      final result = await ImageGallerySaver.saveImage(
+      // Save to gallery using Gal package
+      await Gal.putImageBytes(
         pngBytes,
-        quality: 100,
         name: 'drawing_${DateTime.now().millisecondsSinceEpoch}',
       );
 
-      if (result['isSuccess']) {
-        if (!mounted) return;
-        showDialog(
-          context: context,
-          builder:
-              (context) => AlertDialog(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30),
-                ),
-                title: Row(
-                  children: [
-                    const Icon(
-                      Icons.check_circle,
-                      color: Color(0xFF10B981),
-                      size: 30,
-                    ),
-                    const SizedBox(width: 10),
-                    Text(
-                      'Saved!',
-                      style: GoogleFonts.outfit(fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-                content: Text(
-                  'Your drawing has been saved to your gallery!',
-                  style: GoogleFonts.outfit(),
-                ),
-                actions: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      setState(() {
-                        drawingPoints.clear();
-                      });
-                    },
-                    child: Text(
-                      'Draw More',
-                      style: GoogleFonts.outfit(
-                        fontWeight: FontWeight.bold,
-                        color: const Color(0xFF8B80F8),
-                      ),
-                    ),
+      if (!mounted) return;
+      showDialog(
+        context: context,
+        builder:
+            (context) => AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30),
+              ),
+              title: Row(
+                children: [
+                  const Icon(
+                    Icons.check_circle,
+                    color: Color(0xFF10B981),
+                    size: 30,
                   ),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      Navigator.pop(context);
-                    },
-                    child: Text(
-                      'Done',
-                      style: GoogleFonts.outfit(
-                        fontWeight: FontWeight.bold,
-                        color: const Color(0xFF8B80F8),
-                      ),
-                    ),
+                  const SizedBox(width: 10),
+                  Text(
+                    'Saved!',
+                    style: GoogleFonts.outfit(fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
-        );
-      }
+              content: Text(
+                'Your drawing has been saved to your gallery!',
+                style: GoogleFonts.outfit(),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    setState(() {
+                      drawingPoints.clear();
+                    });
+                  },
+                  child: Text(
+                    'Draw More',
+                    style: GoogleFonts.outfit(
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFF8B80F8),
+                    ),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    Navigator.pop(context);
+                  },
+                  child: Text(
+                    'Done',
+                    style: GoogleFonts.outfit(
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFF8B80F8),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+      );
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
