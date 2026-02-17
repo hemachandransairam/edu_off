@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../models/syllabus_model.dart';
+import '../utils/responsive.dart';
 
 // --- STANDARD SELECTION SCREEN ---
 class StandardSelectionScreen extends StatelessWidget {
@@ -8,39 +9,41 @@ class StandardSelectionScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final responsive = Responsive(context);
+
     return Scaffold(
       backgroundColor: const Color(0xFFF3F1FF),
       body: SafeArea(
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
-          padding: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 30),
+          padding: responsive.padding(horizontal: 25.0, vertical: 30),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const SizedBox(height: 20),
-              _buildHeaderIcon(),
-              const SizedBox(height: 35),
+              SizedBox(height: responsive.gap(20)),
+              _buildHeaderIcon(context),
+              SizedBox(height: responsive.gap(35)),
               Text(
                 'Select Your\nNew Level',
                 textAlign: TextAlign.center,
                 style: GoogleFonts.outfit(
-                  fontSize: 42,
+                  fontSize: responsive.sp(42),
                   fontWeight: FontWeight.bold,
                   color: const Color(0xFF1E293B),
                   height: 1.1,
                 ),
               ),
-              const SizedBox(height: 15),
+              SizedBox(height: responsive.gap(15)),
               Text(
                 'Unlock tailored lessons for your grade',
                 textAlign: TextAlign.center,
                 style: GoogleFonts.outfit(
                   color: Colors.grey[600],
-                  fontSize: 17,
+                  fontSize: responsive.sp(17),
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              const SizedBox(height: 50),
+              SizedBox(height: responsive.gap(50)),
               _buildStandardButton(
                 context,
                 'Explorer',
@@ -48,7 +51,7 @@ class StandardSelectionScreen extends StatelessWidget {
                 1,
                 Colors.orange,
               ),
-              const SizedBox(height: 18),
+              SizedBox(height: responsive.gap(18)),
               _buildStandardButton(
                 context,
                 'Adventurer',
@@ -56,7 +59,7 @@ class StandardSelectionScreen extends StatelessWidget {
                 2,
                 Colors.blue,
               ),
-              const SizedBox(height: 18),
+              SizedBox(height: responsive.gap(18)),
               _buildStandardButton(
                 context,
                 'Discoverer',
@@ -64,7 +67,7 @@ class StandardSelectionScreen extends StatelessWidget {
                 3,
                 Colors.green,
               ),
-              const SizedBox(height: 18),
+              SizedBox(height: responsive.gap(18)),
               _buildStandardButton(
                 context,
                 'Scholar',
@@ -72,7 +75,7 @@ class StandardSelectionScreen extends StatelessWidget {
                 4,
                 Colors.purple,
               ),
-              const SizedBox(height: 18),
+              SizedBox(height: responsive.gap(18)),
               _buildStandardButton(
                 context,
                 'Master',
@@ -80,7 +83,7 @@ class StandardSelectionScreen extends StatelessWidget {
                 5,
                 Colors.indigo,
               ),
-              const SizedBox(height: 40),
+              SizedBox(height: responsive.gap(40)),
             ],
           ),
         ),
@@ -88,10 +91,12 @@ class StandardSelectionScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildHeaderIcon() {
+  Widget _buildHeaderIcon(BuildContext context) {
+    final responsive = Responsive(context);
+
     return Center(
       child: Container(
-        padding: const EdgeInsets.all(5),
+        padding: responsive.padding(all: 5),
         decoration: const BoxDecoration(
           shape: BoxShape.circle,
           gradient: LinearGradient(
@@ -99,15 +104,15 @@ class StandardSelectionScreen extends StatelessWidget {
           ),
         ),
         child: Container(
-          padding: const EdgeInsets.all(20),
+          padding: responsive.padding(all: 20),
           decoration: const BoxDecoration(
             color: Colors.white,
             shape: BoxShape.circle,
           ),
-          child: const Icon(
+          child: Icon(
             Icons.school_rounded,
-            size: 50,
-            color: Color(0xFF1E293B),
+            size: responsive.iconSize(50),
+            color: const Color(0xFF1E293B),
           ),
         ),
       ),
@@ -121,13 +126,15 @@ class StandardSelectionScreen extends StatelessWidget {
     int std,
     Color color,
   ) {
+    final responsive = Responsive(context);
+
     return GestureDetector(
       onTap: () => Navigator.pushNamed(context, '/avatar', arguments: std),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 18),
+        padding: responsive.padding(horizontal: 22, vertical: 18),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(30),
+          borderRadius: responsive.borderRadius(30),
           boxShadow: [
             BoxShadow(
               color: color.withOpacity(0.08),
@@ -139,14 +146,18 @@ class StandardSelectionScreen extends StatelessWidget {
         child: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: responsive.padding(all: 12),
               decoration: BoxDecoration(
                 color: color.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(18),
+                borderRadius: responsive.borderRadius(18),
               ),
-              child: Icon(Icons.stars_rounded, color: color, size: 28),
+              child: Icon(
+                Icons.stars_rounded,
+                color: color,
+                size: responsive.iconSize(28),
+              ),
             ),
-            const SizedBox(width: 20),
+            SizedBox(width: responsive.gap(20)),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -154,7 +165,7 @@ class StandardSelectionScreen extends StatelessWidget {
                   Text(
                     trait,
                     style: GoogleFonts.outfit(
-                      fontSize: 13,
+                      fontSize: responsive.sp(13),
                       color: color,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 0.5,
@@ -163,7 +174,7 @@ class StandardSelectionScreen extends StatelessWidget {
                   Text(
                     title,
                     style: GoogleFonts.outfit(
-                      fontSize: 20,
+                      fontSize: responsive.sp(20),
                       fontWeight: FontWeight.bold,
                       color: const Color(0xFF1E293B),
                     ),
@@ -171,7 +182,11 @@ class StandardSelectionScreen extends StatelessWidget {
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right_rounded, color: Colors.grey),
+            Icon(
+              Icons.chevron_right_rounded,
+              color: Colors.grey,
+              size: responsive.iconSize(24),
+            ),
           ],
         ),
       ),
@@ -220,6 +235,8 @@ class _AvatarSelectionScreenState extends State<AvatarSelectionScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final responsive = Responsive(context);
+
     return Scaffold(
       backgroundColor: const Color(0xFFF3F1FF),
       appBar: AppBar(
@@ -227,6 +244,7 @@ class _AvatarSelectionScreenState extends State<AvatarSelectionScreen> {
           'Choose Your Friend',
           style: GoogleFonts.outfit(
             fontWeight: FontWeight.bold,
+            fontSize: responsive.sp(20),
             color: const Color(0xFF1E293B),
           ),
         ),
@@ -235,16 +253,20 @@ class _AvatarSelectionScreenState extends State<AvatarSelectionScreen> {
         iconTheme: const IconThemeData(color: Color(0xFF1E293B)),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(25.0),
+        padding: responsive.padding(all: 25.0),
         child: Column(
           children: [
             Expanded(
               child: GridView.builder(
                 physics: const BouncingScrollPhysics(),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 20,
-                  mainAxisSpacing: 20,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: responsive.gridColumns(
+                    mobile: 2,
+                    tablet: 3,
+                    desktop: 4,
+                  ),
+                  crossAxisSpacing: responsive.gap(20),
+                  mainAxisSpacing: responsive.gap(20),
                   childAspectRatio: 0.9,
                 ),
                 itemCount: avatars.length,
@@ -262,7 +284,7 @@ class _AvatarSelectionScreenState extends State<AvatarSelectionScreen> {
                       duration: const Duration(milliseconds: 300),
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(35),
+                        borderRadius: responsive.borderRadius(35),
                         border: Border.all(
                           color: isSelected ? color : Colors.transparent,
                           width: 3,
@@ -282,31 +304,31 @@ class _AvatarSelectionScreenState extends State<AvatarSelectionScreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Container(
-                            padding: const EdgeInsets.all(20),
+                            padding: responsive.padding(all: 20),
                             decoration: BoxDecoration(
                               color: color.withOpacity(0.1),
                               shape: BoxShape.circle,
                             ),
                             child: Icon(
                               avatar['icon'] as IconData,
-                              size: 55,
+                              size: responsive.iconSize(55),
                               color: color,
                             ),
                           ),
-                          const SizedBox(height: 15),
+                          SizedBox(height: responsive.gap(15)),
                           Text(
                             avatar['name'] as String,
                             style: GoogleFonts.outfit(
-                              fontSize: 18,
+                              fontSize: responsive.sp(18),
                               fontWeight: FontWeight.bold,
                               color: const Color(0xFF1E293B),
                             ),
                           ),
                           if (isSelected)
-                            const Icon(
+                            Icon(
                               Icons.check_circle,
-                              color: Color(0xFF8B80F8),
-                              size: 24,
+                              color: const Color(0xFF8B80F8),
+                              size: responsive.iconSize(24),
                             ),
                         ],
                       ),
@@ -315,7 +337,7 @@ class _AvatarSelectionScreenState extends State<AvatarSelectionScreen> {
                 },
               ),
             ),
-            const SizedBox(height: 30),
+            SizedBox(height: responsive.gap(30)),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -335,9 +357,9 @@ class _AvatarSelectionScreenState extends State<AvatarSelectionScreen> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF1E293B),
                   foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 22),
+                  padding: responsive.padding(vertical: 22),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(25),
+                    borderRadius: responsive.borderRadius(25),
                   ),
                   elevation: 0,
                   disabledBackgroundColor: Colors.grey[300],
@@ -345,13 +367,13 @@ class _AvatarSelectionScreenState extends State<AvatarSelectionScreen> {
                 child: Text(
                   'Start My Journey',
                   style: GoogleFonts.outfit(
-                    fontSize: 20,
+                    fontSize: responsive.sp(20),
                     fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: responsive.gap(20)),
           ],
         ),
       ),

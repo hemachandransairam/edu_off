@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../services/data_service.dart';
+import '../utils/responsive.dart';
 import 'auth_screen.dart'; // To access ProfilePage if needed or Logout
 import 'selection_screens.dart';
+import 'activities_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   final int standard;
@@ -74,36 +76,44 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildHomeTab() {
+    final responsive = Responsive(context);
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SizedBox(height: 60),
+          SizedBox(height: responsive.hp(0.075)),
           _buildHeader(),
-          const SizedBox(height: 25),
+          SizedBox(height: responsive.gap(25)),
           _buildLevelCard(),
-          const SizedBox(height: 30),
+          SizedBox(height: responsive.gap(30)),
           _buildCategoryNav(),
-          const SizedBox(height: 30),
+          SizedBox(height: responsive.gap(30)),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
+            padding: responsive.padding(horizontal: 20),
             child: _buildDashboardByStandard(),
           ),
-          const SizedBox(height: 120),
+          SizedBox(height: responsive.gap(120)),
         ],
       ),
     );
   }
 
   Widget _buildHeader() {
+    final responsive = Responsive(context);
+    final avatarSize = responsive.value(
+      mobile: 65.0,
+      tablet: 80.0,
+      desktop: 95.0,
+    );
+
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: responsive.padding(horizontal: 20),
       child: Row(
         children: [
           Container(
-            width: 65,
-            height: 65,
+            width: avatarSize,
+            height: avatarSize,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               border: Border.all(color: Colors.white, width: 3),
@@ -116,18 +126,18 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(35),
+              borderRadius: BorderRadius.circular(avatarSize / 2),
               child: Container(
                 color: const Color(0xFFFFC6A5),
                 child: Icon(
                   _getAvatarIcon(widget.avatar),
                   color: const Color(0xFF1E293B),
-                  size: 35,
+                  size: responsive.iconSize(35),
                 ),
               ),
             ),
           ),
-          const SizedBox(width: 15),
+          SizedBox(width: responsive.gap(15)),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -135,23 +145,23 @@ class _HomeScreenState extends State<HomeScreen> {
                 Text(
                   'Hello, ${_userData?['name'] ?? 'Marion'}',
                   style: GoogleFonts.outfit(
-                    fontSize: 22,
+                    fontSize: responsive.sp(22),
                     fontWeight: FontWeight.bold,
                     color: const Color(0xFF1E293B),
                   ),
                 ),
                 Row(
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.av_timer_rounded,
-                      size: 16,
+                      size: responsive.iconSize(16),
                       color: Colors.grey,
                     ),
-                    const SizedBox(width: 5),
+                    SizedBox(width: responsive.gap(5)),
                     Text(
                       'Progress 10%',
                       style: GoogleFonts.outfit(
-                        fontSize: 14,
+                        fontSize: responsive.sp(14),
                         color: Colors.grey[600],
                         fontWeight: FontWeight.w500,
                       ),
@@ -164,7 +174,7 @@ class _HomeScreenState extends State<HomeScreen> {
           Stack(
             children: [
               Container(
-                padding: const EdgeInsets.all(12),
+                padding: responsive.padding(all: 12),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   shape: BoxShape.circle,
@@ -175,10 +185,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ],
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.notifications_none_rounded,
-                  color: Color(0xFF1E293B),
-                  size: 26,
+                  color: const Color(0xFF1E293B),
+                  size: responsive.iconSize(26),
                 ),
               ),
               Positioned(
@@ -187,7 +197,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Container(
                   width: 10,
                   height: 10,
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     color: Colors.orange,
                     shape: BoxShape.circle,
                   ),
@@ -201,16 +211,18 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildLevelCard() {
+    final responsive = Responsive(context);
+
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 20),
-      padding: const EdgeInsets.all(25),
+      margin: responsive.margin(horizontal: 20),
+      padding: responsive.padding(all: 25),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: [Color(0xFF8B80F8), Color(0xFF6B58F2)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(35),
+        borderRadius: responsive.borderRadius(35),
         boxShadow: [
           BoxShadow(
             color: const Color(0xFF8B80F8).withOpacity(0.3),
@@ -228,29 +240,29 @@ class _HomeScreenState extends State<HomeScreen> {
               Text(
                 'Level $_currentStandard',
                 style: GoogleFonts.outfit(
-                  fontSize: 24,
+                  fontSize: responsive.sp(24),
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
                 ),
               ),
-              const SizedBox(height: 5),
+              SizedBox(height: responsive.gap(5)),
               Text(
                 'This is your first step to greatness!',
                 style: GoogleFonts.outfit(
-                  fontSize: 14,
+                  fontSize: responsive.sp(14),
                   color: Colors.white.withOpacity(0.9),
                 ),
               ),
-              const SizedBox(height: 25),
+              SizedBox(height: responsive.gap(25)),
               _buildProgressBar(),
             ],
           ),
           Positioned(
             right: -10,
-            top: -45,
+            top: responsive.value(mobile: -45.0, tablet: -55.0, desktop: -65.0),
             child: Icon(
               Icons.emoji_events_rounded,
-              size: 100,
+              size: responsive.iconSize(100),
               color: Colors.amber[400],
             ),
           ),
@@ -341,35 +353,56 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildCategoryItem(String title, IconData icon, Color color) {
-    return Padding(
-      padding: const EdgeInsets.only(right: 20),
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(18),
-            decoration: BoxDecoration(
-              color: color,
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: color.withOpacity(0.3),
-                  blurRadius: 10,
-                  offset: const Offset(0, 5),
-                ),
-              ],
+    final responsive = Responsive(context);
+
+    return GestureDetector(
+      onTap: () {
+        if (title == 'Activities') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const ActivitiesScreen()),
+          );
+        } else if (title == 'Lessons') {
+          setState(() => _currentIndex = 1);
+        } else if (title == 'Games') {
+          setState(() => _currentIndex = 2);
+        }
+        // Add more navigation for Stories and Discover later
+      },
+      child: Padding(
+        padding: responsive.padding(right: 20),
+        child: Column(
+          children: [
+            Container(
+              padding: responsive.padding(all: 18),
+              decoration: BoxDecoration(
+                color: color,
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: color.withOpacity(0.3),
+                    blurRadius: 10,
+                    offset: const Offset(0, 5),
+                  ),
+                ],
+              ),
+              child: Icon(
+                icon,
+                color: Colors.white,
+                size: responsive.iconSize(30),
+              ),
             ),
-            child: Icon(icon, color: Colors.white, size: 30),
-          ),
-          const SizedBox(height: 10),
-          Text(
-            title,
-            style: GoogleFonts.outfit(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: const Color(0xFF1E293B),
+            SizedBox(height: responsive.gap(10)),
+            Text(
+              title,
+              style: GoogleFonts.outfit(
+                fontSize: responsive.sp(14),
+                fontWeight: FontWeight.w600,
+                color: const Color(0xFF1E293B),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -407,13 +440,15 @@ class _HomeScreenState extends State<HomeScreen> {
     Color color,
     VoidCallback onTap,
   ) {
+    final responsive = Responsive(context);
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(25),
+        padding: responsive.padding(all: 25),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(35),
+          borderRadius: responsive.borderRadius(35),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.03),
@@ -431,7 +466,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.all(10),
+                        padding: responsive.padding(all: 10),
                         decoration: BoxDecoration(
                           color: const Color(0xFF8B80F8).withOpacity(0.1),
                           shape: BoxShape.circle,
@@ -439,25 +474,27 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: Icon(
                           icon,
                           color: const Color(0xFF8B80F8),
-                          size: 24,
+                          size: responsive.iconSize(24),
                         ),
                       ),
-                      const SizedBox(width: 12),
-                      Text(
-                        title,
-                        style: GoogleFonts.outfit(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          color: const Color(0xFF1E293B),
+                      SizedBox(width: responsive.gap(12)),
+                      Flexible(
+                        child: Text(
+                          title,
+                          style: GoogleFonts.outfit(
+                            fontSize: responsive.sp(22),
+                            fontWeight: FontWeight.bold,
+                            color: const Color(0xFF1E293B),
+                          ),
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 15),
+                  SizedBox(height: responsive.gap(15)),
                   Text(
                     subtitle,
                     style: GoogleFonts.outfit(
-                      fontSize: 14,
+                      fontSize: responsive.sp(14),
                       color: Colors.grey[600],
                       height: 1.5,
                     ),
@@ -465,17 +502,17 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
             ),
-            const SizedBox(width: 15),
+            SizedBox(width: responsive.gap(15)),
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: responsive.padding(all: 12),
               decoration: const BoxDecoration(
                 color: Color(0xFF1E293B),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.north_east_rounded,
                 color: Colors.white,
-                size: 20,
+                size: responsive.iconSize(20),
               ),
             ),
           ],
@@ -485,12 +522,14 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildFloatingBottomNav() {
+    final responsive = Responsive(context);
+
     return Container(
-      margin: const EdgeInsets.only(bottom: 30, left: 30, right: 30),
-      height: 80,
+      margin: responsive.margin(bottom: 30, left: 30, right: 30),
+      height: responsive.value(mobile: 80.0, tablet: 90.0, desktop: 100.0),
       decoration: BoxDecoration(
         color: const Color(0xFF1E293B),
-        borderRadius: BorderRadius.circular(40),
+        borderRadius: responsive.borderRadius(40),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.3),
@@ -512,20 +551,22 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildNavItem(int index, IconData icon) {
+    final responsive = Responsive(context);
     bool isActive = _currentIndex == index;
+
     return GestureDetector(
       onTap: () => setState(() => _currentIndex = index),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 300),
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        padding: responsive.padding(horizontal: 20, vertical: 12),
         decoration: BoxDecoration(
           color: isActive ? const Color(0xFFFFC6A5) : Colors.transparent,
-          borderRadius: BorderRadius.circular(30),
+          borderRadius: responsive.borderRadius(30),
         ),
         child: Icon(
           icon,
           color: isActive ? const Color(0xFF1E293B) : Colors.white60,
-          size: 28,
+          size: responsive.iconSize(28),
         ),
       ),
     );

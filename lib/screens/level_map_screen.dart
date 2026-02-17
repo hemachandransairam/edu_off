@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'dart:math' as math;
+import '../utils/responsive.dart';
 
 class LevelMapScreen extends StatefulWidget {
   final String topicName;
@@ -44,6 +45,7 @@ class _LevelMapScreenState extends State<LevelMapScreen>
   @override
   Widget build(BuildContext context) {
     final theme = _getSubjectTheme(widget.subject);
+    final responsive = Responsive(context);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF3F1FF),
@@ -52,6 +54,7 @@ class _LevelMapScreenState extends State<LevelMapScreen>
           widget.topicName,
           style: GoogleFonts.outfit(
             fontWeight: FontWeight.bold,
+            fontSize: responsive.sp(20),
             color: const Color(0xFF1E293B),
           ),
         ),
@@ -66,8 +69,16 @@ class _LevelMapScreenState extends State<LevelMapScreen>
             top: -50,
             right: -50,
             child: Container(
-              width: 200,
-              height: 200,
+              width: responsive.value(
+                mobile: 200.0,
+                tablet: 250.0,
+                desktop: 300.0,
+              ),
+              height: responsive.value(
+                mobile: 200.0,
+                tablet: 250.0,
+                desktop: 300.0,
+              ),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: theme['color'].withOpacity(0.05),
@@ -78,8 +89,16 @@ class _LevelMapScreenState extends State<LevelMapScreen>
             bottom: -80,
             left: -80,
             child: Container(
-              width: 250,
-              height: 250,
+              width: responsive.value(
+                mobile: 250.0,
+                tablet: 300.0,
+                desktop: 350.0,
+              ),
+              height: responsive.value(
+                mobile: 250.0,
+                tablet: 300.0,
+                desktop: 350.0,
+              ),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: theme['color'].withOpacity(0.05),
@@ -92,15 +111,15 @@ class _LevelMapScreenState extends State<LevelMapScreen>
             slivers: [
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.all(20.0),
+                  padding: responsive.padding(all: 20.0),
                   child: Column(
                     children: [
                       // Topic header
                       Container(
-                        padding: const EdgeInsets.all(20),
+                        padding: responsive.padding(all: 20),
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(25),
+                          borderRadius: responsive.borderRadius(25),
                           boxShadow: [
                             BoxShadow(
                               color: Colors.black.withOpacity(0.04),
@@ -112,7 +131,7 @@ class _LevelMapScreenState extends State<LevelMapScreen>
                         child: Row(
                           children: [
                             Container(
-                              padding: const EdgeInsets.all(15),
+                              padding: responsive.padding(all: 15),
                               decoration: BoxDecoration(
                                 color: theme['color'].withOpacity(0.1),
                                 shape: BoxShape.circle,
@@ -120,10 +139,10 @@ class _LevelMapScreenState extends State<LevelMapScreen>
                               child: Icon(
                                 theme['icon'],
                                 color: theme['color'],
-                                size: 30,
+                                size: responsive.iconSize(30),
                               ),
                             ),
-                            const SizedBox(width: 15),
+                            SizedBox(width: responsive.gap(15)),
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -131,16 +150,16 @@ class _LevelMapScreenState extends State<LevelMapScreen>
                                   Text(
                                     widget.topicName,
                                     style: GoogleFonts.outfit(
-                                      fontSize: 20,
+                                      fontSize: responsive.sp(20),
                                       fontWeight: FontWeight.bold,
                                       color: const Color(0xFF1E293B),
                                     ),
                                   ),
-                                  const SizedBox(height: 5),
+                                  SizedBox(height: responsive.gap(5)),
                                   Text(
                                     'Level $unlockedLevel of ${widget.levels.length}',
                                     style: GoogleFonts.outfit(
-                                      fontSize: 14,
+                                      fontSize: responsive.sp(14),
                                       color: Colors.grey[600],
                                     ),
                                   ),
@@ -158,7 +177,7 @@ class _LevelMapScreenState extends State<LevelMapScreen>
                           ],
                         ),
                       ),
-                      const SizedBox(height: 40),
+                      SizedBox(height: responsive.gap(40)),
                       // Level path
                       _buildLevelPath(theme),
                     ],
@@ -191,6 +210,7 @@ class _LevelMapScreenState extends State<LevelMapScreen>
   }
 
   Widget _buildLevelNode(int index, Map<String, dynamic> theme) {
+    final responsive = Responsive(context);
     final levelNumber = index + 1;
     final isUnlocked = levelNumber <= unlockedLevel;
     final isCurrent = levelNumber == unlockedLevel;
@@ -204,8 +224,19 @@ class _LevelMapScreenState extends State<LevelMapScreen>
     final double horizontalOffset = math.sin(index * 1.2) * 0.3;
     final double leftPosition = 0.5 + horizontalOffset;
 
+    final nodeSize = responsive.value(
+      mobile: 85.0,
+      tablet: 100.0,
+      desktop: 115.0,
+    );
+    final currentNodeSize = responsive.value(
+      mobile: 95.0,
+      tablet: 110.0,
+      desktop: 125.0,
+    );
+
     return Positioned(
-      left: MediaQuery.of(context).size.width * leftPosition - 45,
+      left: MediaQuery.of(context).size.width * leftPosition - (nodeSize / 2),
       top: MediaQuery.of(context).size.height * 0.65 * verticalPosition,
       child: GestureDetector(
         onTap:
@@ -217,8 +248,8 @@ class _LevelMapScreenState extends State<LevelMapScreen>
             // Level circle - larger and more prominent
             AnimatedContainer(
               duration: const Duration(milliseconds: 300),
-              width: isCurrent ? 95 : 85,
-              height: isCurrent ? 95 : 85,
+              width: isCurrent ? currentNodeSize : nodeSize,
+              height: isCurrent ? currentNodeSize : nodeSize,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient:
@@ -252,8 +283,12 @@ class _LevelMapScreenState extends State<LevelMapScreen>
                       animation: _animationController,
                       builder: (context, child) {
                         return Container(
-                          width: 95 + (_animationController.value * 25),
-                          height: 95 + (_animationController.value * 25),
+                          width:
+                              currentNodeSize +
+                              (_animationController.value * 25),
+                          height:
+                              currentNodeSize +
+                              (_animationController.value * 25),
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             border: Border.all(
@@ -268,32 +303,36 @@ class _LevelMapScreenState extends State<LevelMapScreen>
                     ),
                   // Level content
                   if (isCompleted)
-                    const Icon(
+                    Icon(
                       Icons.check_circle,
                       color: Colors.white,
-                      size: 45,
+                      size: responsive.iconSize(45),
                     )
                   else if (isUnlocked)
                     Text(
                       '$levelNumber',
                       style: GoogleFonts.outfit(
-                        fontSize: 36,
+                        fontSize: responsive.sp(36),
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
                       ),
                     )
                   else
-                    Icon(Icons.lock, color: Colors.grey[500], size: 38),
+                    Icon(
+                      Icons.lock,
+                      color: Colors.grey[500],
+                      size: responsive.iconSize(38),
+                    ),
                 ],
               ),
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: responsive.gap(12)),
             // Level label
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              padding: responsive.padding(horizontal: 14, vertical: 8),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(18),
+                borderRadius: responsive.borderRadius(18),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withOpacity(0.06),
@@ -305,7 +344,7 @@ class _LevelMapScreenState extends State<LevelMapScreen>
               child: Text(
                 'Level $levelNumber',
                 style: GoogleFonts.outfit(
-                  fontSize: 13,
+                  fontSize: responsive.sp(13),
                   fontWeight: FontWeight.bold,
                   color: isUnlocked ? theme['color'] : Colors.grey[500],
                 ),
